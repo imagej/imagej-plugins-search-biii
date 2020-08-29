@@ -27,7 +27,7 @@
  * #L%
  */
 
-package org.scijava.search.web;
+package net.imagej.search.biii;
 
 import org.scijava.Priority;
 import org.scijava.log.LogService;

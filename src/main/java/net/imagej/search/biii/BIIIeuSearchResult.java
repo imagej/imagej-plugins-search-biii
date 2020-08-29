@@ -26,9 +26,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
-package org.scijava.search.web;
+package net.imagej.search.biii;
 
 import java.util.Map;
+
+import org.scijava.search.web.WebSearchResult;
 
 public class BIIIeuSearchResult extends WebSearchResult {
     public BIIIeuSearchResult(String name, String url, String details, String icon, Map<String, String> extraProperties) {
