@@ -29,24 +29,28 @@
 
 package net.imagej.search.biii;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.search.SearchResult;
 import org.scijava.search.Searcher;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * A searcher for the <a href="http://biii.eu/search">Bio-Imaging Search
@@ -72,56 +76,32 @@ public class BIIIeuSearcher implements Searcher {
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
 		searchResults.clear();
-
 		try {
-			final URL url = new URL("http://biii.eu/searchjsonexport?search_api_fulltext=(?=" + URLEncoder.encode(text, "utf-8") + ")(?=ImageJ)&_format=json&source=imagej");
-
-			StringBuilder contentBuilder = new StringBuilder();
-
-			BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-
-			String inputLine;
-			while ((inputLine = in.readLine()) != null) {
-				contentBuilder.append(inputLine);
-			}
-			in.close();
-
-			// JSONParser parser = new JSONParser(contentBuilder.toString(), , true);
-			JSONArray root = new JSONArray(contentBuilder.toString());
-			parse(root);
+			URL url = new URL("http://biii.eu/searchjsonexport?search_api_fulltext=(?="
+					+ URLEncoder.encode(text, "utf-8") + ")(?=ImageJ)&_format=json&source=imagej");
+			JsonArray json = JsonParser.parseReader(new InputStreamReader(url.openStream())).getAsJsonArray();
+			json.forEach(e -> searchResults.add(createResult(e)));
+		} catch (MalformedURLException exc) {
+			log.debug(exc);
+		} catch (UnsupportedEncodingException exc) {
+			log.debug(exc);
+		} catch (JsonIOException exc) {
+			log.debug(exc);
+		} catch (JsonSyntaxException exc) {
+			log.debug(exc);
+		} catch (IOException exc) {
+			log.debug(exc);
 		}
-		catch (final IOException e) {
-			log.debug(e);
-		}
-		catch (JSONException e) {
-			log.debug(e);
-		}
+		
 		return searchResults;
 	}
 
-	private void parse(JSONArray root) {
-
-		for (int count = 0;; count++) {
-
-			JSONObject obj = null;
-			try {
-				obj = root.getJSONObject(count);
-			} catch (JSONException e) {
-				break;
-			}
-			if (obj == null) {
-				break;
-			}
-
-			final String title = readString(obj, "title");
-			final String link = "http://biii.eu/" + correctStringForShortLink(readString(obj, "title"));
-			final String summary = readString(obj, "body");
-
-			SearchResult result = new BIIIeuSearchResult(title, link, summary, DEFAULT_ICON, null);
-
-			searchResults.add(result);
-
-		}
+	private SearchResult createResult(JsonElement e) {
+		JsonObject obj = e.getAsJsonObject();
+		String title = obj.get("title").getAsString();
+		String link = "http://biii.eu/" + correctStringForShortLink(title);
+		String summary = obj.get("body").getAsString();
+		return new BIIIeuSearchResult(title, link, summary, DEFAULT_ICON, null);
 	}
 
 	private String correctStringForShortLink(String title) {
@@ -181,27 +161,6 @@ public class BIIIeuSearcher implements Searcher {
 		}
 
 		return title;
-	}
-
-	private String readString(JSONObject obj, String key) {
-		String result = "";
-		try {
-			result = obj.getString(key);
-		} catch (JSONException e) {
-			System.out.print("Error reading " + key);
-		}
-		return result;
-	}
-
-
-	private int readInteger(JSONObject obj, String key) {
-		int result = 0;
-		try {
-			result = obj.getInt(key);
-		} catch (JSONException e) {
-			System.out.print("Error reading " + key);
-		}
-		return result;
 	}
 
 	// for testing
