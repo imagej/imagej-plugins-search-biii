@@ -35,7 +35,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +55,7 @@ import com.google.gson.JsonSyntaxException;
  * A searcher for the <a href="http://biii.eu/search">Bio-Imaging Search
  * Engine</a>.
  *
- * @author Robert Haase (MPI-CBG)
+ * @author Robert Haase (MPI-CBG), Jan Eglinger (FMI Basel)
  */
 @Plugin(type = Searcher.class, enabled = false)
 public class BIIIeuSearcher implements Searcher {
@@ -99,68 +98,9 @@ public class BIIIeuSearcher implements Searcher {
 	private SearchResult createResult(JsonElement e) {
 		JsonObject obj = e.getAsJsonObject();
 		String title = obj.get("title").getAsString();
-		String link = "http://biii.eu/" + correctStringForShortLink(title);
+		String link = "http://biii.eu/node/" + obj.get("nid").getAsString();
 		String summary = obj.get("body").getAsString();
 		return new BIIIeuSearchResult(title, link, summary, DEFAULT_ICON, null);
-	}
-
-	private String correctStringForShortLink(String title) {
-		title = title.replace(" ", "-");
-		title = title.toLowerCase();
-
-		// remove words and special characters
-		String[] stringsToRemove = {
-				"(", ")", "{", "}", "[", "]",
-				".", ",", ";", ";",
-				"&", "*", "@", "!", "$","%","~","`",
-				" a ",
-				" an ",
-				" as ",
-				" at ",
-				" before ",
-				" but ",
-				" by ",
-				" for ",
-				" from ",
-				" is ",
-				" in ",
-				" into ",
-				" like ",
-				" of " ,
-				" off ",
-				" on ",
-				" onto ",
-				" per ",
-				" since ",
-				" than ",
-				" the ",
-				" this ",
-				" that ",
-				" to ",
-				" up ",
-				" via ",
-				" with "
-		};
-		for (String remove : stringsToRemove) {
-			title = title.replace(remove, "");
-
-			String trimmedRemove = remove.trim();
-			if (title.startsWith(trimmedRemove + " ")) {
-				title = title.substring(trimmedRemove.length() + 1);
-			}
-		}
-
-		// remove special charactes
-		title = Normalizer.normalize(title, Normalizer.Form.NFD);
-		title = title.replaceAll("[^\\p{ASCII}]", "");
-
-		// shorten
-		title = title.trim();
-		if (title.length() > 100) {
-			title = title.substring(0, 100);
-		}
-
-		return title;
 	}
 
 	// for testing
