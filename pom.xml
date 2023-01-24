@@ -11,7 +11,7 @@
 
 	<groupId>net.imagej</groupId>
 	<artifactId>imagej-plugins-search-biii</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 
 	<name>ImageJ Search Plugins for BIII</name>
 	<description>Search plugins to enable BIII search in SciJava.</description>
@@ -68,7 +68,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/imagej/imagej-plugins-search-biii</connection>
 		<developerConnection>scm:git:git@github.com:imagej/imagej-plugins-search-biii</developerConnection>
-		<tag>HEAD</tag>
+		<tag>imagej-plugins-search-biii-0.0.1</tag>
 		<url>https://github.com/imagej/imagej-plugins-search-biii</url>
 	</scm>
 	<issueManagement>
