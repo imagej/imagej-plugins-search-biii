@@ -1,2 +1,2 @@
-[![](https://travis-ci.com/imagej/imagej-plugins-search-biii.svg?branch=master)](https://travis-ci.com/imagej/imagej-plugins-search-biii)
+[![](https://github.com/imagej/imagej-plugins-search-biii/actions/workflows/build.yml/badge.svg)](https://github.com/imagej/imagej-plugins-search-biii/actions/workflows/build.yml)
 
