@@ -11,7 +11,7 @@ Activate the update site `NEUBIAS`.
 
 ## Using BIII search
 
-Enter a search-term within the 
+Enter a search-term within the search field of the Fiji main window and activate the `BioImage Informatics Index` checkbox.
 
 ![img.png](docs/screenshot.png)
 
